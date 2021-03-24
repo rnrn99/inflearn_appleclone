@@ -59,8 +59,13 @@
     function setLayout () {
         //각 스크롤 섹션의 높이 세팅
         for(let i = 0; i < sceneInfo.length ; i++){
-            sceneInfo[i].scrollHeight = sceneInfo[i].heightNum * window.innerHeight;
-            sceneInfo[i].objs.container.style.height = `${sceneInfo[i].scrollHeight}px`; 
+            if(sceneInfo[i].type === 'sticky'){
+                sceneInfo[i].scrollHeight = sceneInfo[i].heightNum * window.innerHeight;
+            } 
+            else if(sceneInfo[i].type === 'normal') {
+                sceneInfo[i].scrollHeight = sceneInfo[i].objs.container.offsetHeight;
+            }
+            sceneInfo[i].objs.container.style.height = `${sceneInfo[i].scrollHeight}px`
         }
 
         yOffset = window.pageYOffset;
@@ -112,20 +117,15 @@
 
         switch (currentScene) {
             case 0:
-                let fadeIn_a = calcValues(values.messageA_opacity_in, currentYOffset);
-                let fadeOut_a = calcValues(values.messageA_opacity_out, currentYOffset);
-                let translateY_in_a = calcValues(values.messageA_translateY_in, currentYOffset);
-                let translateY_out_a = calcValues(values.messageA_translateY_out, currentYOffset);
-
                 let point = (values.messageA_opacity_out[2].start + values.messageA_opacity_in[2].end) / 2
 
                 if( scrollRatio <= point){
-                    objs.messageA.style.opacity = fadeIn_a;
-                    objs.messageA.style.transform = `translateY(${translateY_in_a}%)`;
+                    objs.messageA.style.opacity = calcValues(values.messageA_opacity_in, currentYOffset);
+                    objs.messageA.style.transform = `translateY(${calcValues(values.messageA_translateY_in, currentYOffset)}%)`;
                 }
                 else {
-                    objs.messageA.style.opacity = fadeOut_a;
-                    objs.messageA.style.transform = `translateY(${translateY_out_a}%)`;
+                    objs.messageA.style.opacity = calcValues(values.messageA_opacity_out, currentYOffset);
+                    objs.messageA.style.transform = `translateY(${calcValues(values.messageA_translateY_out, currentYOffset)}%)`;
                 }
 
 
