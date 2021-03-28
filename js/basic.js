@@ -16,7 +16,10 @@
                 messageA: document.querySelector('#scroll-section-0 .main-message.a'),
                 messageB: document.querySelector('#scroll-section-0 .main-message.b'),
                 messageC: document.querySelector('#scroll-section-0 .main-message.c'),
-                messageD: document.querySelector('#scroll-section-0 .main-message.d')
+                messageD: document.querySelector('#scroll-section-0 .main-message.d'),
+                canvas: document.querySelector('#video-canvas-0'),
+                context: document.querySelector('#video-canvas-0').getContext('2d'),
+                videoImages: []
             },
             values: {
                 messageA_opacity_in: [0, 1, { start: 0.1, end: 0.2 }],
@@ -37,7 +40,11 @@
                 messageD_opacity_in: [0, 1, { start: 0.7, end: 0.8 }],
                 messageD_opacity_out: [1, 0, { start: 0.85, end: 0.9 }],
                 messageD_translateY_in: [20, 0, { start: 0.7, end: 0.8 }],
-                messageD_translateY_out: [0, -20, { start: 0.85, end: 0.9 }]
+                messageD_translateY_out: [0, -20, { start: 0.85, end: 0.9 }],
+
+                videoImageCount: 300,
+                imageSequence: [0, 299],
+                canvas_opacity: [1, 0, {start: 0.9, end: 1}]
             }
         },
         {
@@ -60,7 +67,10 @@
                 messageB: document.querySelector('#scroll-section-2 .b'),
                 messageC: document.querySelector('#scroll-section-2 .c'),
                 pinB: document.querySelector('#scroll-section-2 .b .pin'),
-                pinC: document.querySelector('#scroll-section-2 .c .pin')
+                pinC: document.querySelector('#scroll-section-2 .c .pin'),
+                canvas: document.querySelector('#video-canvas-1'),
+                context: document.querySelector('#video-canvas-1').getContext('2d'),
+                videoImages: []
             },
             values: {
                 messageA_opacity_in: [0, 1, { start: 0.25, end: 0.3 }],
@@ -79,7 +89,12 @@
                 messageC_translateY_out: [0, -20, { start: 0.95, end: 1 }],
 
                 pinB_scaleY: [0.5, 1, { start: 0.6, end: 0.65 }],
-                pinC_scaleY: [0.5, 1, { start: 0.87, end: 0.92 }]
+                pinC_scaleY: [0.5, 1, { start: 0.87, end: 0.92 }],
+
+                videoImageCount: 960,
+                imageSequence: [0, 959],
+                canvas_opacity_in: [0, 1, {start: 0, end: 0.1}],
+                canvas_opacity_out: [1, 0, {start: 0.95, end: 1}]
             }
         },
         {
@@ -96,6 +111,24 @@
             }
         }
     ];
+
+    function setCanvasImage() {
+        let imgElem;
+        for(let i = 0; i< sceneInfo[0].values.videoImageCount; i++){
+            imgElem = new Image();
+            imgElem.src = `./video/001/IMG_${6726 + i}.JPG`;
+            sceneInfo[0].objs.videoImages.push(imgElem);
+        }
+
+        let imgElem2;
+        for(let i = 0; i< sceneInfo[2].values.videoImageCount; i++){
+            imgElem2 = new Image();
+            imgElem2.src = `./video/002/IMG_${7027 + i}.JPG`;
+            sceneInfo[2].objs.videoImages.push(imgElem2);
+        }
+
+    }
+    setCanvasImage();
 
     function setLayout() {
         //각 스크롤 섹션의 높이 세팅
@@ -120,6 +153,13 @@
         }
 
         document.body.setAttribute('id', `show-scene-${currentScene}`);
+
+        //캔버스 크기 설정
+        const heightRatio = window.innerHeight / 1080;
+        // 창에 맞추기 위해서 css에서 50%씩 밀어놓고 여기서 원상복구함. 가운데정렬
+        sceneInfo[0].objs.canvas.style.transform = `translate3d(-50%, -50%, 0) scale(${heightRatio})`;
+        sceneInfo[2].objs.canvas.style.transform = `translate3d(-50%, -50%, 0) scale(${heightRatio})`;
+
     }
 
     function calcValues(values, currentYOffset) {
@@ -156,6 +196,10 @@
 
         switch (currentScene) {
             case 0:
+                let sequence = Math.round(calcValues(values.imageSequence, currentYOffset));
+                objs.context.drawImage(objs.videoImages[sequence], 0, 0);
+                objs.canvas.style.opacity = calcValues(values.canvas_opacity, currentYOffset);
+
                 if (scrollRatio <= 0.22) {
                     objs.messageA.style.opacity = calcValues(values.messageA_opacity_in, currentYOffset);
                     objs.messageA.style.transform = `translateY(${calcValues(values.messageA_translateY_in, currentYOffset)}%)`;
@@ -195,6 +239,16 @@
                 break;
 
             case 2:
+                let sequence_2 = Math.round(calcValues(values.imageSequence, currentYOffset));
+                objs.context.drawImage(objs.videoImages[sequence_2], 0, 0);
+
+                if(scrollRatio <= 0.5) {
+                    objs.canvas.style.opacity = calcValues(values.canvas_opacity_in, currentYOffset);   
+                } else {
+                    objs.canvas.style.opacity = calcValues(values.canvas_opacity_out, currentYOffset);
+                }
+
+
                 if (scrollRatio <= 0.32) {
                     objs.messageA.style.opacity = calcValues(values.messageA_opacity_in, currentYOffset);
                     objs.messageA.style.transform = `translate3d(0, ${calcValues(values.messageA_translateY_in, currentYOffset)}%, 0)`;
@@ -262,7 +316,10 @@
         scrollLoop();
     });
     window.addEventListener('resize', setLayout);
-    window.addEventListener('load', setLayout);
+    window.addEventListener('load', () => {
+        setLayout();
+        sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
+    });
 
     setLayout();
 })();
