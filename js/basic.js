@@ -44,7 +44,7 @@
 
                 videoImageCount: 300,
                 imageSequence: [0, 299],
-                canvas_opacity: [1, 0, {start: 0.9, end: 1}]
+                canvas_opacity: [1, 0, { start: 0.9, end: 1 }]
             }
         },
         {
@@ -93,8 +93,8 @@
 
                 videoImageCount: 960,
                 imageSequence: [0, 959],
-                canvas_opacity_in: [0, 1, {start: 0, end: 0.1}],
-                canvas_opacity_out: [1, 0, {start: 0.95, end: 1}]
+                canvas_opacity_in: [0, 1, { start: 0, end: 0.1 }],
+                canvas_opacity_out: [1, 0, { start: 0.95, end: 1 }]
             }
         },
         {
@@ -114,33 +114,34 @@
                 images: []
             },
             values: {
-
+                rect1: [0, 0, { start: 0, end: 0 }],
+                rect2: [0, 0, { start: 0, end: 0 }],
+                rectStartY: 0
             }
         }
     ];
 
     function setCanvasImage() {
         let imgElem;
-        for(let i = 0; i< sceneInfo[0].values.videoImageCount; i++){
+        for (let i = 0; i < sceneInfo[0].values.videoImageCount; i++) {
             imgElem = new Image();
             imgElem.src = `./video/001/IMG_${6726 + i}.JPG`;
             sceneInfo[0].objs.videoImages.push(imgElem);
         }
 
         let imgElem2;
-        for(let i = 0; i< sceneInfo[2].values.videoImageCount; i++){
+        for (let i = 0; i < sceneInfo[2].values.videoImageCount; i++) {
             imgElem2 = new Image();
             imgElem2.src = `./video/002/IMG_${7027 + i}.JPG`;
             sceneInfo[2].objs.videoImages.push(imgElem2);
         }
 
         let imgElem3;
-        for(let i = 0; i < sceneInfo[3].objs.imagePath.length; i++){
+        for (let i = 0; i < sceneInfo[3].objs.imagePath.length; i++) {
             imgElem3 = new Image();
             imgElem3.src = sceneInfo[3].objs.imagePath[i];
             sceneInfo[3].objs.images.push(imgElem3);
         }
-        console.log(sceneInfo[3].objs.images);
     }
     setCanvasImage();
 
@@ -256,8 +257,8 @@
                 let sequence_2 = Math.round(calcValues(values.imageSequence, currentYOffset));
                 objs.context.drawImage(objs.videoImages[sequence_2], 0, 0);
 
-                if(scrollRatio <= 0.5) {
-                    objs.canvas.style.opacity = calcValues(values.canvas_opacity_in, currentYOffset);   
+                if (scrollRatio <= 0.5) {
+                    objs.canvas.style.opacity = calcValues(values.canvas_opacity_in, currentYOffset);
                 } else {
                     objs.canvas.style.opacity = calcValues(values.canvas_opacity_out, currentYOffset);
                 }
@@ -299,7 +300,7 @@
                 const heightRatio = window.innerHeight / objs.canvas.height;
                 let canvasScaleRatio;
 
-                if(widthRatio <= heightRatio) {
+                if (widthRatio <= heightRatio) {
                     // 캔버스보다 브라우저의 가로 길이가 작은 경우
                     canvasScaleRatio = heightRatio;
                 } else {
@@ -308,7 +309,27 @@
                 }
 
                 objs.canvas.style.transform = `scale(${canvasScaleRatio})`;
-                objs.context.drawImage(objs.images[0],0,0);
+                objs.context.drawImage(objs.images[0], 0, 0);
+
+                // 흰색 사각형 그리기
+                // 설정된 canvasScaleRatio에 맞춰 다시 innerWidth, innerHeight 구해야함
+                const ratio_width = document.body.offsetWidth / canvasScaleRatio;
+                // const ratio_height = window.innerHeight / canvasScaleRatio;
+
+                const rectWidth = ratio_width * 0.15;
+
+                values.rect1[0] = (objs.canvas.width - ratio_width) / 2; //출발값
+                values.rect1[1] = values.rect1[0] - rectWidth;           //최종값
+                values.rect2[0] = values.rect1[0] + ratio_width - rectWidth;
+                values.rect2[1] = values.rect2[0] + rectWidth;
+
+                objs.context.fillRect(values.rect1[0], 0, parseInt(rectWidth), objs.canvas.height);
+                objs.context.fillRect(values.rect2[0], 0, parseInt(rectWidth), objs.canvas.height);
+
+                if(!values.rectStartY){
+                    values.rectStartY = objs.canvas.getBoundingClientRect().top;
+                    console.log(values.rectStartY);
+                }
 
                 break;
         }
