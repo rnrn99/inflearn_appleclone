@@ -67,6 +67,7 @@ a {
 }
 
 .scroll-section {
+    position: relative;
     padding-top: 50vh;
 }
 #scroll-section-0 h1 {
@@ -129,8 +130,10 @@ a {
     left: 50%;
 }
 
-/* .image-blend-canvas {
-} */
+.image-blend-canvas.sticky {
+    position: fixed;
+    top: 0;
+} 
 
 #scroll-section-3 {
     display: flex;
