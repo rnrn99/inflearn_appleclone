@@ -153,7 +153,6 @@
             sceneInfo[3].objs.images.push(imgElem3);
         }
     }
-    setCanvasImage();
 
     function checkMenu() {
         if (yOffset > 44) { document.body.classList.add('local-nav-sticky'); }
@@ -515,11 +514,19 @@
             rafState = true;
         }
     });
-    window.addEventListener('resize', setLayout);
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) { setLayout(); }
+        sceneInfo[3].values.rectStartY = 0;
+    });
     window.addEventListener('load', () => {
+        document.body.classList.remove('before-load');
         setLayout();
         sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
     });
+    window.addEventListener('orientationchange', setLayout);
+    document.querySelector('.loading').addEventListener('transitionend', (e) => {
+        document.body.removeChild(e.currentTarget);
+    });
 
-    setLayout();
+    setCanvasImage();
 })();
