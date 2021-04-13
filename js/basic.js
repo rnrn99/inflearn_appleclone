@@ -483,7 +483,7 @@
         delayedYOffset = delayedYOffset + (yOffset - delayedYOffset) * acc;
 
         if (!changeScene) {
-           
+
             if (currentScene === 0 || currentScene === 2) {
                 const objs = sceneInfo[currentScene].objs;
                 const values = sceneInfo[currentScene].values;
@@ -495,7 +495,7 @@
                 }
             }
         }
-        
+
         rafId = requestAnimationFrame(loop);
 
         if (Math.abs(yOffset - delayedYOffset) < 1) {
@@ -504,28 +504,51 @@
         }
     }
 
-    window.addEventListener('scroll', () => {
-        yOffset = window.pageYOffset;
-        scrollLoop();
-        checkMenu();
-
-        if (!rafState) {
-            rafId = requestAnimationFrame(loop);
-            rafState = true;
-        }
-    });
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 900) { setLayout(); }
-        sceneInfo[3].values.rectStartY = 0;
-    });
     window.addEventListener('load', () => {
         document.body.classList.remove('before-load');
         setLayout();
         sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
-    });
-    window.addEventListener('orientationchange', setLayout);
-    document.querySelector('.loading').addEventListener('transitionend', (e) => {
-        document.body.removeChild(e.currentTarget);
+
+        let tempYOffset = yOffset;
+        let tempScrollCount = 0;
+
+        if (yOffset > 0) {
+            let siId = setInterval(() => {
+                window.scrollTo(0, tempYOffset);
+                tempYOffset += 2;
+
+                if (tempScrollCount > 10) { clearInterval(siId); }
+
+                tempScrollCount++;
+            }, 20);
+        }
+
+        // 로딩 중 어떤 행동을 취할 시 에러가 나는 것을 방지하기 위함
+        window.addEventListener('scroll', () => {
+            yOffset = window.pageYOffset;
+            scrollLoop();
+            checkMenu();
+
+            if (!rafState) {
+                rafId = requestAnimationFrame(loop);
+                rafState = true;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900) {
+                window.location.reload();
+            }
+        });
+
+        window.addEventListener('orientationchange', () => {
+            scrollTo(0, 0);
+            setTimeout(() => { window.location.reload(); }, 500);
+        });
+
+        document.querySelector('.loading').addEventListener('transitionend', (e) => {
+            document.body.removeChild(e.currentTarget);
+        });
     });
 
     setCanvasImage();
