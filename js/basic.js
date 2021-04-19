@@ -463,7 +463,7 @@
 
         if (delayedYOffset > prevScrollHeight + sceneInfo[currentScene].scrollHeight) {
             changeScene = true;
-            currentScene++;
+            if(currentScene < sceneInfo.length - 1) { currentScene++; }
             document.body.setAttribute('id', `show-scene-${currentScene}`);
         }
 

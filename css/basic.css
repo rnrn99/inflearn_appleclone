@@ -273,6 +273,10 @@ body.before-load {
     animation: loading-circle-animation 1s infinite;
 }
 
+.normal-content {
+    margin-bottom: 10rem;
+}
+
 @media (min-width: 1024px) {
     #scroll-section-0 h1 {
         font-size: 9vw;
